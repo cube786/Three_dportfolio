@@ -1,11 +1,12 @@
-import React, {Suspense} from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Decal, Float, OrbitControls, Preload, useTexture } from '@react-three/drei';
-import CanvasLoader from '../Loader';
+import React, { Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Decal, Float, OrbitControls, Preload, useTexture } from "@react-three/drei";
+import CanvasLoader from "../Loader";
 
-const Ball = (props) => {
-  const [decal] = useTexture([props.imgUrl]);
-  decal.anisotropy = 4;
+const Ball = ({ imgUrl }) => {
+  const [decal] = useTexture([imgUrl]);
+  decal.anisotropy = 4; // improve texture on mobile
+
   return (
     <Float speed={1.75} rotationIntensity={1} floatIntensity={2}>
       <ambientLight intensity={0.25} />
@@ -13,43 +14,36 @@ const Ball = (props) => {
       <mesh castShadow receiveShadow scale={2.75}>
         <icosahedronGeometry args={[1, 1]} />
         <meshStandardMaterial
-          color='#fff8eb'
+          color="#fff8eb"
           polygonOffset
           polygonOffsetFactor={-5}
           flatShading
         />
-        <Decal
-          position={[0, 0, 1]}
-          rotation={[2 * Math.PI, 0, 6.25]}
-          scale={1}
-          map={decal}
-          flatShading
-        />
+        <Decal position={[0, 0, 1]} rotation={[2 * Math.PI, 0, 6.25]} scale={1} map={decal} flatShading />
       </mesh>
     </Float>
-  )
-}
+  );
+};
 
-const BallCanvas = ({icon}) => {
+const BallCanvas = ({ icon }) => {
   return (
     <Canvas
-      // frameloop='demand'
-      gl={{ preserveDrawingBuffer: true ,
-
-          powerPreference: "high-performance",
-    antialias: true,
-    alpha: true,
-    precision: "mediump" 
+      dpr={1} // force lower DPR for mobile
+      gl={{
+        preserveDrawingBuffer: true,
+        powerPreference: "high-performance",
+        antialias: true,
+        alpha: true,
+        precision: "lowp", // low precision for Android
       }}
     >
       <Suspense fallback={<CanvasLoader />}>
-        <OrbitControls enableZoom={false}/>
+        <OrbitControls enableZoom={false} />
         <Ball imgUrl={icon} />
       </Suspense>
-
       <Preload all />
     </Canvas>
-  )
-}
+  );
+};
 
-export default BallCanvas
+export default BallCanvas;
